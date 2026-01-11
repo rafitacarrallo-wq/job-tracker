@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface CompanyLogoProps {
@@ -88,6 +88,11 @@ export function CompanyLogo({
   className,
 }: CompanyLogoProps) {
   const [imgError, setImgError] = useState(false);
+
+  // Reset error state when companyWebsite changes
+  useEffect(() => {
+    setImgError(false);
+  }, [companyWebsite]);
 
   // Clean up the website domain (remove protocol, www, trailing slashes)
   const cleanDomain = companyWebsite

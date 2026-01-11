@@ -27,7 +27,9 @@
       "Bash(findstr:*)",
       "Bash(cmd //c \"taskkill /PID 27108 /F\")",
       "Bash(cmd //c \"taskkill /F /IM node.exe\")",
-      "Bash(git -C \"C:\\\\Users\\\\Rafa\\\\job-tracker\" log --oneline -10)"
+      "Bash(git -C \"C:\\\\Users\\\\Rafa\\\\job-tracker\" log --oneline -10)",
+      "WebFetch(domain:logo.clearbit.com)",
+      "Bash(npx next build)"
     ]
   }
 }
