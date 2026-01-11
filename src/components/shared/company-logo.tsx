@@ -101,11 +101,12 @@ export function CompanyLogo({
     .replace(/\/.*$/, "")
     .trim();
 
+  // Use Google's favicon API (reliable and free)
   const logoUrl = cleanDomain
-    ? `https://logo.clearbit.com/${cleanDomain}`
+    ? `https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`
     : null;
 
-  // Show Clearbit logo if we have a domain and no error
+  // Show logo if we have a domain and no error
   if (logoUrl && !imgError) {
     return (
       <div
