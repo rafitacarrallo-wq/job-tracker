@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id              String            @id @default(cuid())
+  company         String
+  companyDomain   String?
+  companyLogo     String?
+  position        String
+  applicationDate DateTime          @default(now())
+  status          String            @default("SAVED")
+  jobUrl          String?
+  salaryMin       Int?
+  salaryMax       Int?
+  salaryExpected  Int?
+  interestLevel   Int               @default(3)
+  source          String            @default("OTHER")
+  notes           String?
+  nextStep        String?
+  nextStepDate    DateTime?
+  cvVersion       String?
+  coverLetter     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  contacts        ApplicationContact[]
+}
+
+model Contact {
+  id           String   @id @default(cuid())
+  name         String
+  company      String?
+  position     String?
+  linkedinUrl  String?
+  email        String?
+  phone        String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  interactions Interaction[]
+  applications ApplicationContact[]
+  reminders    Reminder[]
+}
+
+model Interaction {
+  id        String   @id @default(cuid())
+  contactId String
+  content   String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  contactId String
+  title     String
+  dueDate   DateTime
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model ApplicationContact {
+  id            String @id @default(cuid())
+  applicationId String
+  contactId     String
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  contact       Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, contactId])
+}
+
+model WatchlistCompany {
+  id          String   @id @default(cuid())
+  name        String
+  domain      String?
+  logo        String?
+  notes       String?
+  careersUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

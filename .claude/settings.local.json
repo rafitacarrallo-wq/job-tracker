@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(npx shadcn@latest add button card dialog input label select textarea badge dropdown-menu separator scroll-area avatar tooltip popover calendar command sheet table tabs -y)",
+      "Bash(npm run build:*)",
+      "Bash(taskkill:*)",
+      "Bash(ping:*)",
+      "Bash(curl:*)",
+      "Bash(nslookup:*)",
+      "Bash(gh --version:*)",
+      "Bash(git config:*)",
+      "Bash(if exist nul del /f nul)",
+      "Bash(git add:*)"
+    ]
+  }
+}
