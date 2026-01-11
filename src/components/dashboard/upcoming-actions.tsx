@@ -10,7 +10,7 @@ import { CompanyLogo } from "@/components/shared/company-logo";
 interface UpcomingAction {
   id: string;
   company: string;
-  companyWebsite: string | null;
+  companyDomain: string | null;
   position: string;
   nextStep: string | null;
   nextStepDate: string;
@@ -38,7 +38,7 @@ interface UpcomingTask {
     id: string;
     company: string;
     position: string;
-    companyWebsite: string | null;
+    companyDomain: string | null;
   } | null;
   watchlist: {
     id: string;
@@ -118,7 +118,7 @@ export function UpcomingActions({ actions, reminders, tasks }: UpcomingActionsPr
                   >
                     <CompanyLogo
                       company={action.company}
-                      companyWebsite={action.companyWebsite}
+                      companyDomain={action.companyDomain}
                       size="sm"
                     />
                     <div className="flex-1 min-w-0">
@@ -198,7 +198,7 @@ export function UpcomingActions({ actions, reminders, tasks }: UpcomingActionsPr
                     return (
                       <CompanyLogo
                         company={task.application.company}
-                        companyWebsite={task.application.companyWebsite}
+                        companyDomain={task.application.companyDomain}
                         size="sm"
                       />
                     );
@@ -207,7 +207,7 @@ export function UpcomingActions({ actions, reminders, tasks }: UpcomingActionsPr
                     return (
                       <CompanyLogo
                         company={task.watchlist.name}
-                        companyWebsite={task.watchlist.careersUrl}
+                        companyDomain={task.watchlist.careersUrl}
                         size="sm"
                       />
                     );

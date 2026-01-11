@@ -12,7 +12,7 @@ model Application {
   id              String            @id @default(cuid())
   company         String
   companyLogo     String?
-  companyWebsite  String?
+  companyDomain   String?
   position        String
   applicationDate DateTime          @default(now())
   status          String            @default("SAVED")

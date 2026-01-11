@@ -20,7 +20,7 @@ interface DashboardData {
   upcomingActions: Array<{
     id: string;
     company: string;
-    companyWebsite: string | null;
+    companyDomain: string | null;
     position: string;
     nextStep: string | null;
     nextStepDate: string;
@@ -46,7 +46,7 @@ interface DashboardData {
       id: string;
       company: string;
       position: string;
-      companyWebsite: string | null;
+      companyDomain: string | null;
     } | null;
     watchlist: {
       id: string;
@@ -62,7 +62,7 @@ interface DashboardData {
   recentApplications: Array<{
     id: string;
     company: string;
-    companyWebsite: string | null;
+    companyDomain: string | null;
     position: string;
     status: "SAVED" | "APPLIED" | "INTERVIEW" | "OFFER" | "REJECTED" | "ARCHIVED";
     applicationDate: string;

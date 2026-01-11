@@ -74,7 +74,7 @@ export async function GET() {
       select: {
         id: true,
         company: true,
-        companyWebsite: true,
+        companyDomain: true,
         position: true,
         nextStep: true,
         nextStepDate: true,
@@ -120,7 +120,7 @@ export async function GET() {
             id: true,
             company: true,
             position: true,
-            companyWebsite: true,
+            companyDomain: true,
           },
         },
         watchlist: {
@@ -161,7 +161,7 @@ export async function GET() {
       select: {
         id: true,
         company: true,
-        companyWebsite: true,
+        companyDomain: true,
         position: true,
         status: true,
         applicationDate: true,

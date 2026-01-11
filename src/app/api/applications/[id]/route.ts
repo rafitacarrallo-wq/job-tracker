@@ -48,7 +48,7 @@ export async function PUT(
       data: {
         company: body.company,
         companyLogo: body.companyLogo,
-        companyWebsite: body.companyWebsite,
+        companyDomain: body.companyDomain,
         position: body.position,
         applicationDate: body.applicationDate
           ? new Date(body.applicationDate)

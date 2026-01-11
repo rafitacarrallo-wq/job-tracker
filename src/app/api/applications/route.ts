@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       data: {
         company: body.company,
         companyLogo: body.companyLogo || null,
-        companyWebsite: body.companyWebsite || null,
+        companyDomain: body.companyDomain || null,
         position: body.position,
         applicationDate: body.applicationDate
           ? new Date(body.applicationDate)

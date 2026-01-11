@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface CompanyLogoProps {
   company: string;
-  companyWebsite?: string | null;
+  companyDomain?: string | null;
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -83,19 +83,19 @@ function InitialsFallback({
 
 export function CompanyLogo({
   company,
-  companyWebsite,
+  companyDomain,
   size = "md",
   className,
 }: CompanyLogoProps) {
   const [imgError, setImgError] = useState(false);
 
-  // Reset error state when companyWebsite changes
+  // Reset error state when companyDomain changes
   useEffect(() => {
     setImgError(false);
-  }, [companyWebsite]);
+  }, [companyDomain]);
 
   // Clean up the website domain (remove protocol, www, trailing slashes)
-  const cleanDomain = companyWebsite
+  const cleanDomain = companyDomain
     ?.replace(/^https?:\/\//, "")
     .replace(/^www\./, "")
     .replace(/\/.*$/, "")

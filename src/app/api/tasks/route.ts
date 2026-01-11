@@ -33,7 +33,7 @@ export async function GET(request: Request) {
             id: true,
             company: true,
             position: true,
-            companyWebsite: true,
+            companyDomain: true,
           },
         },
         watchlist: {
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
         select: {
           id: true,
           company: true,
-          companyWebsite: true,
+          companyDomain: true,
           position: true,
           nextStep: true,
           nextStepDate: true,
@@ -101,7 +101,7 @@ export async function GET(request: Request) {
           id: app.id,
           company: app.company,
           position: app.position,
-          companyWebsite: app.companyWebsite,
+          companyDomain: app.companyDomain,
         },
         watchlist: null,
         contact: null,

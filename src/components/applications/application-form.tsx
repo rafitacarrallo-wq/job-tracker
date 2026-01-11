@@ -54,7 +54,7 @@ export function ApplicationForm({
 }: ApplicationFormProps) {
   const [formData, setFormData] = useState({
     company: "",
-    companyWebsite: "",
+    companyDomain: "",
     position: "",
     applicationDate: new Date(),
     status: defaultStatus as ApplicationStatus,
@@ -77,7 +77,7 @@ export function ApplicationForm({
     if (application) {
       setFormData({
         company: application.company,
-        companyWebsite: application.companyWebsite || "",
+        companyDomain: application.companyDomain || "",
         position: application.position,
         applicationDate: new Date(application.applicationDate),
         status: application.status,
@@ -100,7 +100,7 @@ export function ApplicationForm({
     } else {
       setFormData({
         company: "",
-        companyWebsite: "",
+        companyDomain: "",
         position: "",
         applicationDate: new Date(),
         status: defaultStatus,
@@ -174,12 +174,12 @@ export function ApplicationForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="companyWebsite">Company Website (for logo)</Label>
+              <Label htmlFor="companyDomain">Company Website (for logo)</Label>
               <Input
-                id="companyWebsite"
-                value={formData.companyWebsite}
+                id="companyDomain"
+                value={formData.companyDomain}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, companyWebsite: e.target.value }))
+                  setFormData((prev) => ({ ...prev, companyDomain: e.target.value }))
                 }
                 placeholder="e.g., google.com"
               />

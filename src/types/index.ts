@@ -41,7 +41,7 @@ export interface Application {
   id: string;
   company: string;
   companyLogo: string | null;
-  companyWebsite: string | null;
+  companyDomain: string | null;
   position: string;
   applicationDate: Date;
   status: ApplicationStatus;
@@ -118,7 +118,7 @@ export interface Task {
     id: string;
     company: string;
     position: string;
-    companyWebsite: string | null;
+    companyDomain: string | null;
   } | null;
   watchlistId: string | null;
   watchlist?: {
