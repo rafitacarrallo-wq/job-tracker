@@ -23,7 +23,6 @@ export async function POST(request: Request) {
     const company = await prisma.watchlistCompany.create({
       data: {
         name: body.name,
-        domain: body.domain || null,
         logo: body.logo || null,
         notes: body.notes || null,
         careersUrl: body.careersUrl || null,

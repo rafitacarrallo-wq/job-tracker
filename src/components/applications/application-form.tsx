@@ -27,6 +27,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { StarRating } from "@/components/shared/star-rating";
+import { FileUpload } from "@/components/ui/file-upload";
 import { cn } from "@/lib/utils";
 import {
   APPLICATION_STATUSES,
@@ -44,24 +45,6 @@ interface ApplicationFormProps {
   defaultStatus?: ApplicationStatus;
 }
 
-// Extract clean domain from URL or domain string
-function cleanDomain(input: string): string {
-  let domain = input.trim().toLowerCase();
-  domain = domain.replace(/^https?:\/\//, "");
-  domain = domain.replace(/^www\./, "");
-  domain = domain.split("/")[0];
-  domain = domain.split(":")[0];
-  return domain;
-}
-
-function inferDomain(company: string): string | null {
-  const cleaned = company.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (cleaned) {
-    return `${cleaned}.com`;
-  }
-  return null;
-}
-
 export function ApplicationForm({
   open,
   onOpenChange,
@@ -71,7 +54,7 @@ export function ApplicationForm({
 }: ApplicationFormProps) {
   const [formData, setFormData] = useState({
     company: "",
-    companyDomain: "",
+    companyWebsite: "",
     position: "",
     applicationDate: new Date(),
     status: defaultStatus as ApplicationStatus,
@@ -84,15 +67,17 @@ export function ApplicationForm({
     notes: "",
     nextStep: "",
     nextStepDate: null as Date | null,
-    cvVersion: "",
-    coverLetter: "",
+    cvUrl: "",
+    cvFileName: "",
+    coverLetterUrl: "",
+    coverLetterFileName: "",
   });
 
   useEffect(() => {
     if (application) {
       setFormData({
         company: application.company,
-        companyDomain: application.companyDomain || "",
+        companyWebsite: application.companyWebsite || "",
         position: application.position,
         applicationDate: new Date(application.applicationDate),
         status: application.status,
@@ -107,13 +92,15 @@ export function ApplicationForm({
         nextStepDate: application.nextStepDate
           ? new Date(application.nextStepDate)
           : null,
-        cvVersion: application.cvVersion || "",
-        coverLetter: application.coverLetter || "",
+        cvUrl: application.cvUrl || "",
+        cvFileName: application.cvFileName || "",
+        coverLetterUrl: application.coverLetterUrl || "",
+        coverLetterFileName: application.coverLetterFileName || "",
       });
     } else {
       setFormData({
         company: "",
-        companyDomain: "",
+        companyWebsite: "",
         position: "",
         applicationDate: new Date(),
         status: defaultStatus,
@@ -126,19 +113,13 @@ export function ApplicationForm({
         notes: "",
         nextStep: "",
         nextStepDate: null,
-        cvVersion: "",
-        coverLetter: "",
+        cvUrl: "",
+        cvFileName: "",
+        coverLetterUrl: "",
+        coverLetterFileName: "",
       });
     }
   }, [application, defaultStatus, open]);
-
-  const handleCompanyChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      company: value,
-      companyDomain: prev.companyDomain || inferDomain(value) || "",
-    }));
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +136,7 @@ export function ApplicationForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="md:max-w-2xl">
+      <DialogContent className="max-h-[90vh] overflow-y-auto md:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             {application ? "Edit Application" : "New Application"}
@@ -170,36 +151,13 @@ export function ApplicationForm({
               <Input
                 id="company"
                 value={formData.company}
-                onChange={(e) => handleCompanyChange(e.target.value)}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, company: e.target.value }))
+                }
                 placeholder="e.g., Google"
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="companyDomain">Domain (for logo)</Label>
-              <Input
-                id="companyDomain"
-                value={formData.companyDomain}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    companyDomain: e.target.value,
-                  }))
-                }
-                onBlur={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    companyDomain: e.target.value
-                      ? cleanDomain(e.target.value)
-                      : "",
-                  }))
-                }
-                placeholder="e.g., google.com or https://google.com"
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="position">Position *</Label>
               <Input
@@ -212,6 +170,20 @@ export function ApplicationForm({
                 required
               />
             </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="companyWebsite">Company Website (for logo)</Label>
+              <Input
+                id="companyWebsite"
+                value={formData.companyWebsite}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, companyWebsite: e.target.value }))
+                }
+                placeholder="e.g., google.com"
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="jobUrl">Job URL</Label>
               <Input
@@ -221,7 +193,7 @@ export function ApplicationForm({
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, jobUrl: e.target.value }))
                 }
-                placeholder="https://..."
+                placeholder="https://careers.google.com/job/123"
               />
             </div>
           </div>
@@ -409,31 +381,32 @@ export function ApplicationForm({
 
           {/* Documents */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="cvVersion">CV Version</Label>
-              <Input
-                id="cvVersion"
-                value={formData.cvVersion}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, cvVersion: e.target.value }))
-                }
-                placeholder="e.g., CV_v2_tech.pdf"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="coverLetter">Cover Letter</Label>
-              <Input
-                id="coverLetter"
-                value={formData.coverLetter}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    coverLetter: e.target.value,
-                  }))
-                }
-                placeholder="e.g., CL_Google.pdf"
-              />
-            </div>
+            <FileUpload
+              label="CV / Resume"
+              currentUrl={formData.cvUrl || null}
+              currentFileName={formData.cvFileName || null}
+              onUpload={(url, fileName) =>
+                setFormData((prev) => ({ ...prev, cvUrl: url, cvFileName: fileName }))
+              }
+              onRemove={() =>
+                setFormData((prev) => ({ ...prev, cvUrl: "", cvFileName: "" }))
+              }
+              fileType="cv"
+              applicationId={application?.id}
+            />
+            <FileUpload
+              label="Cover Letter"
+              currentUrl={formData.coverLetterUrl || null}
+              currentFileName={formData.coverLetterFileName || null}
+              onUpload={(url, fileName) =>
+                setFormData((prev) => ({ ...prev, coverLetterUrl: url, coverLetterFileName: fileName }))
+              }
+              onRemove={() =>
+                setFormData((prev) => ({ ...prev, coverLetterUrl: "", coverLetterFileName: "" }))
+              }
+              fileType="coverLetter"
+              applicationId={application?.id}
+            />
           </div>
 
           {/* Notes */}

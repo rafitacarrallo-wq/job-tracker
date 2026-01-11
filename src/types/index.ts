@@ -40,8 +40,8 @@ export const APPLICATION_SOURCES: {
 export interface Application {
   id: string;
   company: string;
-  companyDomain: string | null;
   companyLogo: string | null;
+  companyWebsite: string | null;
   position: string;
   applicationDate: Date;
   status: ApplicationStatus;
@@ -54,8 +54,10 @@ export interface Application {
   notes: string | null;
   nextStep: string | null;
   nextStepDate: Date | null;
-  cvVersion: string | null;
-  coverLetter: string | null;
+  cvUrl: string | null;
+  cvFileName: string | null;
+  coverLetterUrl: string | null;
+  coverLetterFileName: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,6 +75,7 @@ export interface Contact {
   updatedAt: Date;
   interactions?: Interaction[];
   reminders?: Reminder[];
+  tasks?: Task[];
 }
 
 export interface Interaction {
@@ -95,10 +98,41 @@ export interface Reminder {
 export interface WatchlistCompany {
   id: string;
   name: string;
-  domain: string | null;
   logo: string | null;
   notes: string | null;
   careersUrl: string | null;
   createdAt: Date;
   updatedAt: Date;
+  tasks?: Task[];
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string | null;
+  dueDate: Date | null;
+  completed: boolean;
+  link: string | null;
+  applicationId: string | null;
+  application?: {
+    id: string;
+    company: string;
+    position: string;
+    companyWebsite: string | null;
+  } | null;
+  watchlistId: string | null;
+  watchlist?: {
+    id: string;
+    name: string;
+    careersUrl: string | null;
+  } | null;
+  contactId: string | null;
+  contact?: {
+    id: string;
+    name: string;
+    company: string | null;
+  } | null;
+  createdAt: Date;
+  updatedAt: Date;
+  type?: "task" | "nextStep";
 }

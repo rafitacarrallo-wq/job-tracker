@@ -30,8 +30,8 @@ export async function POST(request: Request) {
     const application = await prisma.application.create({
       data: {
         company: body.company,
-        companyDomain: body.companyDomain || null,
         companyLogo: body.companyLogo || null,
+        companyWebsite: body.companyWebsite || null,
         position: body.position,
         applicationDate: body.applicationDate
           ? new Date(body.applicationDate)
@@ -46,8 +46,10 @@ export async function POST(request: Request) {
         notes: body.notes || null,
         nextStep: body.nextStep || null,
         nextStepDate: body.nextStepDate ? new Date(body.nextStepDate) : null,
-        cvVersion: body.cvVersion || null,
-        coverLetter: body.coverLetter || null,
+        cvUrl: body.cvUrl || null,
+        cvFileName: body.cvFileName || body.cvVersion || null,
+        coverLetterUrl: body.coverLetterUrl || null,
+        coverLetterFileName: body.coverLetterFileName || body.coverLetter || null,
       },
     });
 

@@ -31,8 +31,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
           <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <CompanyLogo
               company={company.name}
-              domain={company.domain}
-              logo={company.logo}
+              companyWebsite={company.careersUrl}
               size="md"
             />
             <div className="min-w-0">

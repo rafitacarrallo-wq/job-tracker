@@ -3,15 +3,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Application {
   id              String            @id @default(cuid())
   company         String
-  companyDomain   String?
   companyLogo     String?
+  companyWebsite  String?
   position        String
   applicationDate DateTime          @default(now())
   status          String            @default("SAVED")
@@ -24,12 +25,15 @@ model Application {
   notes           String?
   nextStep        String?
   nextStepDate    DateTime?
-  cvVersion       String?
-  coverLetter     String?
+  cvUrl           String?
+  cvFileName      String?
+  coverLetterUrl  String?
+  coverLetterFileName String?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
   contacts        ApplicationContact[]
+  tasks           Task[]
 }
 
 model Contact {
@@ -47,6 +51,7 @@ model Contact {
   interactions Interaction[]
   applications ApplicationContact[]
   reminders    Reminder[]
+  tasks        Task[]
 }
 
 model Interaction {
@@ -84,10 +89,32 @@ model ApplicationContact {
 model WatchlistCompany {
   id          String   @id @default(cuid())
   name        String
-  domain      String?
   logo        String?
   notes       String?
   careersUrl  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  tasks       Task[]
+}
+
+model Task {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  dueDate       DateTime?
+  completed     Boolean   @default(false)
+  link          String?
+
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+
+  watchlistId   String?
+  watchlist     WatchlistCompany? @relation(fields: [watchlistId], references: [id], onDelete: SetNull)
+
+  contactId     String?
+  contact       Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }

@@ -5,29 +5,9 @@ import { cn } from "@/lib/utils";
 
 interface CompanyLogoProps {
   company: string;
-  domain?: string | null;
-  logo?: string | null;
+  companyWebsite?: string | null;
   size?: "sm" | "md" | "lg";
   className?: string;
-}
-
-// Extract clean domain from URL or domain string
-function cleanDomain(input: string): string {
-  let domain = input.trim().toLowerCase();
-
-  // Remove protocol
-  domain = domain.replace(/^https?:\/\//, "");
-
-  // Remove www.
-  domain = domain.replace(/^www\./, "");
-
-  // Remove path (everything after first /)
-  domain = domain.split("/")[0];
-
-  // Remove port if present
-  domain = domain.split(":")[0];
-
-  return domain;
 }
 
 const sizeClasses = {
@@ -40,6 +20,7 @@ function getInitials(company: string): string {
   return company
     .split(" ")
     .map((word) => word[0])
+    .filter(Boolean)
     .join("")
     .toUpperCase()
     .slice(0, 2);
@@ -74,60 +55,15 @@ function getColorFromString(str: string): string {
   return colors[Math.abs(hash) % colors.length];
 }
 
-export function CompanyLogo({
+function InitialsFallback({
   company,
-  domain,
-  logo,
-  size = "md",
+  size,
   className,
-}: CompanyLogoProps) {
-  const [imgError, setImgError] = useState(false);
-
-  // If we have a custom logo, use it
-  if (logo && !imgError) {
-    return (
-      <div
-        className={cn(
-          "relative flex-shrink-0 overflow-hidden rounded-lg bg-white",
-          sizeClasses[size],
-          className
-        )}
-      >
-        <img
-          src={logo}
-          alt={`${company} logo`}
-          className="h-full w-full object-contain p-1"
-          onError={() => setImgError(true)}
-        />
-      </div>
-    );
-  }
-
-  // Try Clearbit if we have a domain
-  const clearbitUrl = domain
-    ? `https://logo.clearbit.com/${cleanDomain(domain)}`
-    : null;
-
-  if (clearbitUrl && !imgError) {
-    return (
-      <div
-        className={cn(
-          "relative flex-shrink-0 overflow-hidden rounded-lg bg-white",
-          sizeClasses[size],
-          className
-        )}
-      >
-        <img
-          src={clearbitUrl}
-          alt={`${company} logo`}
-          className="h-full w-full object-contain p-1"
-          onError={() => setImgError(true)}
-        />
-      </div>
-    );
-  }
-
-  // Fallback to initials
+}: {
+  company: string;
+  size: "sm" | "md" | "lg";
+  className?: string;
+}) {
   const initials = getInitials(company);
   const bgColor = getColorFromString(company);
 
@@ -143,4 +79,47 @@ export function CompanyLogo({
       {initials}
     </div>
   );
+}
+
+export function CompanyLogo({
+  company,
+  companyWebsite,
+  size = "md",
+  className,
+}: CompanyLogoProps) {
+  const [imgError, setImgError] = useState(false);
+
+  // Clean up the website domain (remove protocol, www, trailing slashes)
+  const cleanDomain = companyWebsite
+    ?.replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/.*$/, "")
+    .trim();
+
+  const logoUrl = cleanDomain
+    ? `https://logo.clearbit.com/${cleanDomain}`
+    : null;
+
+  // Show Clearbit logo if we have a domain and no error
+  if (logoUrl && !imgError) {
+    return (
+      <div
+        className={cn(
+          "relative flex-shrink-0 overflow-hidden rounded-lg bg-white",
+          sizeClasses[size],
+          className
+        )}
+      >
+        <img
+          src={logoUrl}
+          alt={`${company} logo`}
+          className="h-full w-full object-contain p-1"
+          onError={() => setImgError(true)}
+        />
+      </div>
+    );
+  }
+
+  // Fallback to initials
+  return <InitialsFallback company={company} size={size} className={className} />;
 }

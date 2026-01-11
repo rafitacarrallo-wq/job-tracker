@@ -5,37 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { WatchlistCompany } from "@/types";
+import { TasksSection } from "@/components/shared/tasks-section";
+import type { WatchlistCompany, Task } from "@/types";
 
 interface CompanyFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   company?: WatchlistCompany | null;
   onSubmit: (data: Partial<WatchlistCompany>) => void;
-}
-
-// Extract clean domain from URL or domain string
-function cleanDomain(input: string): string {
-  let domain = input.trim().toLowerCase();
-  domain = domain.replace(/^https?:\/\//, "");
-  domain = domain.replace(/^www\./, "");
-  domain = domain.split("/")[0];
-  domain = domain.split(":")[0];
-  return domain;
-}
-
-function inferDomain(name: string): string | null {
-  const cleaned = name.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (cleaned) {
-    return `${cleaned}.com`;
-  }
-  return null;
 }
 
 export function CompanyForm({
@@ -46,35 +30,77 @@ export function CompanyForm({
 }: CompanyFormProps) {
   const [formData, setFormData] = useState({
     name: "",
-    domain: "",
     notes: "",
     careersUrl: "",
   });
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
     if (company) {
       setFormData({
         name: company.name,
-        domain: company.domain || "",
         notes: company.notes || "",
         careersUrl: company.careersUrl || "",
       });
+      // Fetch tasks for this company
+      fetchTasks(company.id);
     } else {
       setFormData({
         name: "",
-        domain: "",
         notes: "",
         careersUrl: "",
       });
+      setTasks([]);
     }
   }, [company, open]);
 
-  const handleNameChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      name: value,
-      domain: prev.domain || inferDomain(value) || "",
-    }));
+  const fetchTasks = async (watchlistId: string) => {
+    try {
+      const response = await fetch(`/api/tasks?watchlistId=${watchlistId}`);
+      const data = await response.json();
+      setTasks(data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
+  const handleTaskCreate = async (taskData: Partial<Task>) => {
+    try {
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(taskData),
+      });
+      const newTask = await response.json();
+      setTasks((prev) => [newTask, ...prev]);
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  };
+
+  const handleTaskUpdate = async (taskId: string, data: Partial<Task>) => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const updatedTask = await response.json();
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? updatedTask : t))
+      );
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
+
+  const handleTaskDelete = async (taskId: string) => {
+    try {
+      await fetch(`/api/tasks/${taskId}`, { method: "DELETE" });
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -85,7 +111,7 @@ export function CompanyForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className={company ? "max-w-lg" : "max-w-md"}>
         <DialogHeader>
           <DialogTitle>
             {company ? "Edit Company" : "Add Company to Watchlist"}
@@ -98,27 +124,11 @@ export function CompanyForm({
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => handleNameChange(e.target.value)}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
               placeholder="e.g., Stripe"
               required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="domain">Domain (for logo)</Label>
-            <Input
-              id="domain"
-              value={formData.domain}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, domain: e.target.value }))
-              }
-              onBlur={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  domain: e.target.value ? cleanDomain(e.target.value) : "",
-                }))
-              }
-              placeholder="e.g., stripe.com or https://stripe.com"
             />
           </div>
 
@@ -133,6 +143,9 @@ export function CompanyForm({
               }
               placeholder="https://stripe.com/careers"
             />
+            <p className="text-xs text-muted-foreground">
+              The company logo will be automatically detected from this URL
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -147,6 +160,22 @@ export function CompanyForm({
               rows={3}
             />
           </div>
+
+          {/* Tasks section - only show when editing */}
+          {company && (
+            <>
+              <Separator />
+              <TasksSection
+                tasks={tasks}
+                entityType="watchlist"
+                entityId={company.id}
+                onTaskCreate={handleTaskCreate}
+                onTaskUpdate={handleTaskUpdate}
+                onTaskDelete={handleTaskDelete}
+                compact
+              />
+            </>
+          )}
 
           <div className="flex justify-end gap-3">
             <Button

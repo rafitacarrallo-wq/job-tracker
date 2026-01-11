@@ -12,11 +12,20 @@ export async function GET() {
     // Get all applications
     const applications = await prisma.application.findMany();
 
-    // Total applications
-    const totalApplications = applications.length;
+    // Saved applications (not yet applied)
+    const savedCount = applications.filter(
+      (app: Application) => app.status === "SAVED"
+    ).length;
 
-    // Applications this week
+    // Total applications (only actually applied: APPLIED, INTERVIEW, OFFER, REJECTED)
+    // Excludes SAVED and ARCHIVED
+    const totalApplications = applications.filter((app: Application) =>
+      ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"].includes(app.status)
+    ).length;
+
+    // Applications this week (only applied ones, not saved)
     const thisWeek = applications.filter((app: Application) => {
+      if (app.status === "SAVED") return false;
       const date = new Date(app.applicationDate);
       return date >= weekStart && date <= weekEnd;
     }).length;
@@ -25,7 +34,9 @@ export async function GET() {
     const responded = applications.filter((app: Application) =>
       ["INTERVIEW", "OFFER", "REJECTED"].includes(app.status)
     ).length;
-    const applied = applications.filter((app: Application) => app.status !== "SAVED").length;
+    const applied = applications.filter((app: Application) =>
+      ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"].includes(app.status)
+    ).length;
     const responseRate = applied > 0 ? Math.round((responded / applied) * 100) : 0;
 
     // Pending interviews
@@ -33,13 +44,15 @@ export async function GET() {
       (app: Application) => app.status === "INTERVIEW"
     ).length;
 
-    // Active applications (not rejected/archived)
-    const activeApplications = applications.filter(
-      (app: Application) => !["REJECTED", "ARCHIVED"].includes(app.status)
+    // Active applications (only APPLIED + INTERVIEW)
+    const activeApplications = applications.filter((app: Application) =>
+      ["APPLIED", "INTERVIEW"].includes(app.status)
     ).length;
 
     // Offers
-    const offers = applications.filter((app: Application) => app.status === "OFFER").length;
+    const offers = applications.filter(
+      (app: Application) => app.status === "OFFER"
+    ).length;
 
     // Watchlist count (saved companies not yet applied to)
     const watchlistCount = await prisma.watchlistCompany.count();
@@ -61,7 +74,7 @@ export async function GET() {
       select: {
         id: true,
         company: true,
-        companyDomain: true,
+        companyWebsite: true,
         position: true,
         nextStep: true,
         nextStepDate: true,
@@ -91,16 +104,64 @@ export async function GET() {
       },
     });
 
-    // Recent applications
+    // Get upcoming tasks (not completed, sorted by due date)
+    const upcomingTasks = await prisma.task.findMany({
+      where: {
+        completed: false,
+      },
+      orderBy: [
+        { dueDate: "asc" },
+        { createdAt: "desc" },
+      ],
+      take: 15,
+      include: {
+        application: {
+          select: {
+            id: true,
+            company: true,
+            position: true,
+            companyWebsite: true,
+          },
+        },
+        watchlist: {
+          select: {
+            id: true,
+            name: true,
+            careersUrl: true,
+          },
+        },
+        contact: {
+          select: {
+            id: true,
+            name: true,
+            company: true,
+          },
+        },
+      },
+    });
+
+    // Count pending tasks
+    const pendingTasksCount = await prisma.task.count({
+      where: {
+        completed: false,
+      },
+    });
+
+    // Recent applications (exclude SAVED - those are shown separately)
     const recentApplications = await prisma.application.findMany({
+      where: {
+        status: {
+          notIn: ["SAVED"],
+        },
+      },
       orderBy: {
-        createdAt: "desc",
+        applicationDate: "desc",
       },
       take: 5,
       select: {
         id: true,
         company: true,
-        companyDomain: true,
+        companyWebsite: true,
         position: true,
         status: true,
         applicationDate: true,
@@ -110,15 +171,18 @@ export async function GET() {
     return NextResponse.json({
       stats: {
         totalApplications,
+        savedCount,
         thisWeek,
         responseRate,
         pendingInterviews,
         activeApplications,
         offers,
         watchlistCount,
+        pendingTasksCount,
       },
       upcomingActions,
       upcomingReminders,
+      upcomingTasks,
       recentApplications,
     });
   } catch (error) {

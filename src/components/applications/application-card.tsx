@@ -37,8 +37,7 @@ export function ApplicationCard({
       <div className="flex items-start gap-3">
         <CompanyLogo
           company={application.company}
-          domain={application.companyDomain}
-          logo={application.companyLogo}
+          companyWebsite={application.companyWebsite}
           size="sm"
         />
 

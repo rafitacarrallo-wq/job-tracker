@@ -47,8 +47,8 @@ export async function PUT(
       where: { id },
       data: {
         company: body.company,
-        companyDomain: body.companyDomain,
         companyLogo: body.companyLogo,
+        companyWebsite: body.companyWebsite,
         position: body.position,
         applicationDate: body.applicationDate
           ? new Date(body.applicationDate)
@@ -63,8 +63,10 @@ export async function PUT(
         notes: body.notes,
         nextStep: body.nextStep,
         nextStepDate: body.nextStepDate ? new Date(body.nextStepDate) : null,
-        cvVersion: body.cvVersion,
-        coverLetter: body.coverLetter,
+        cvUrl: body.cvUrl,
+        cvFileName: body.cvFileName,
+        coverLetterUrl: body.coverLetterUrl,
+        coverLetterFileName: body.coverLetterFileName,
       },
     });
 

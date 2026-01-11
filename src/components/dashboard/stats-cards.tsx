@@ -8,12 +8,14 @@ import {
   Target,
   Award,
   Bookmark,
+  Clock,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface StatsCardsProps {
   stats: {
     totalApplications: number;
+    savedCount: number;
     thisWeek: number;
     responseRate: number;
     pendingInterviews: number;
@@ -26,68 +28,90 @@ interface StatsCardsProps {
 export function StatsCards({ stats }: StatsCardsProps) {
   const cards = [
     {
-      title: "Total Applications",
+      title: "Applied",
+      description: "Total sent applications",
       value: stats.totalApplications,
       icon: Briefcase,
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
+      color: "text-blue-600",
+      bgColor: "bg-blue-100 dark:bg-blue-900/30",
+    },
+    {
+      title: "Saved",
+      description: "Ready to apply",
+      value: stats.savedCount,
+      icon: Clock,
+      color: "text-slate-600",
+      bgColor: "bg-slate-100 dark:bg-slate-800/50",
     },
     {
       title: "This Week",
+      description: "Applied this week",
       value: stats.thisWeek,
       icon: TrendingUp,
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
+      color: "text-green-600",
+      bgColor: "bg-green-100 dark:bg-green-900/30",
     },
     {
       title: "Response Rate",
+      description: "Got a response",
       value: `${stats.responseRate}%`,
       icon: MessageSquare,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
+      color: "text-purple-600",
+      bgColor: "bg-purple-100 dark:bg-purple-900/30",
     },
     {
       title: "Interviews",
+      description: "Pending interviews",
       value: stats.pendingInterviews,
       icon: Calendar,
-      color: "text-yellow-500",
-      bgColor: "bg-yellow-500/10",
+      color: "text-amber-600",
+      bgColor: "bg-amber-100 dark:bg-amber-900/30",
     },
     {
       title: "Active",
+      description: "In progress",
       value: stats.activeApplications,
       icon: Target,
-      color: "text-cyan-500",
-      bgColor: "bg-cyan-500/10",
+      color: "text-cyan-600",
+      bgColor: "bg-cyan-100 dark:bg-cyan-900/30",
     },
     {
       title: "Offers",
+      description: "Received offers",
       value: stats.offers,
       icon: Award,
-      color: "text-emerald-500",
-      bgColor: "bg-emerald-500/10",
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
     },
     {
       title: "Watchlist",
+      description: "Companies to track",
       value: stats.watchlistCount,
       icon: Bookmark,
-      color: "text-orange-500",
-      bgColor: "bg-orange-500/10",
+      color: "text-orange-600",
+      bgColor: "bg-orange-100 dark:bg-orange-900/30",
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
       {cards.map((card) => (
-        <Card key={card.title}>
-          <CardContent className="p-3 md:p-4">
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className={`rounded-lg p-1.5 md:p-2 ${card.bgColor}`}>
-                <card.icon className={`h-4 w-4 md:h-5 md:w-5 ${card.color}`} />
+        <Card key={card.title} className="overflow-hidden">
+          <CardContent className="p-4 md:p-5">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {card.title}
+                </p>
+                <p className="text-3xl font-bold tracking-tight md:text-4xl">
+                  {card.value}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {card.description}
+                </p>
               </div>
-              <div className="min-w-0">
-                <p className="text-xl font-bold md:text-2xl">{card.value}</p>
-                <p className="truncate text-[10px] text-muted-foreground md:text-xs">{card.title}</p>
+              <div className={`rounded-xl p-2.5 ${card.bgColor}`}>
+                <card.icon className={`h-5 w-5 md:h-6 md:w-6 ${card.color}`} />
               </div>
             </div>
           </CardContent>

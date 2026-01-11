@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import {
   Linkedin,
@@ -14,7 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { InteractionTimeline } from "./interaction-timeline";
 import { InteractionForm } from "./interaction-form";
-import type { Contact, Interaction, Reminder } from "@/types";
+import { TasksSection } from "@/components/shared/tasks-section";
+import type { Contact, Interaction, Reminder, Task } from "@/types";
 
 interface ContactDetailProps {
   contact: Contact & { interactions: Interaction[]; reminders: Reminder[] };
@@ -27,6 +29,61 @@ export function ContactDetail({
   onAddInteraction,
   onEdit,
 }: ContactDetailProps) {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [contact.id]);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch(`/api/tasks?contactId=${contact.id}`);
+      const data = await response.json();
+      setTasks(data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
+  const handleTaskCreate = async (taskData: Partial<Task>) => {
+    try {
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(taskData),
+      });
+      const newTask = await response.json();
+      setTasks((prev) => [newTask, ...prev]);
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  };
+
+  const handleTaskUpdate = async (taskId: string, data: Partial<Task>) => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const updatedTask = await response.json();
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? updatedTask : t))
+      );
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
+
+  const handleTaskDelete = async (taskId: string) => {
+    try {
+      await fetch(`/api/tasks/${taskId}`, { method: "DELETE" });
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
   const getInitials = (name: string) =>
     name
       .split(" ")
@@ -111,6 +168,20 @@ export function ContactDetail({
             </p>
           </div>
         )}
+
+        <Separator className="my-6" />
+
+        {/* Tasks */}
+        <div className="mb-6">
+          <TasksSection
+            tasks={tasks}
+            entityType="contact"
+            entityId={contact.id}
+            onTaskCreate={handleTaskCreate}
+            onTaskUpdate={handleTaskUpdate}
+            onTaskDelete={handleTaskDelete}
+          />
+        </div>
 
         <Separator className="my-6" />
 

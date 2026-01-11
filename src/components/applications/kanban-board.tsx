@@ -1,12 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
-import { Plus } from "lucide-react";
+import { Plus, X, ArrowUp, ArrowDown } from "lucide-react";
 import { KanbanColumn } from "./kanban-column";
 import { ApplicationsMobileList } from "./applications-mobile-list";
 import { ApplicationForm } from "./application-form";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   APPLICATION_STATUSES,
   type Application,
@@ -20,6 +27,16 @@ export function KanbanBoard() {
   const [editingApplication, setEditingApplication] =
     useState<Application | null>(null);
   const [defaultStatus, setDefaultStatus] = useState<ApplicationStatus>("SAVED");
+
+  // Filter states
+  const [companyFilter, setCompanyFilter] = useState<string>("all");
+  const [positionFilter, setPositionFilter] = useState<string>("all");
+
+  // Sort states
+  type SortField = "date" | "company" | "interest";
+  type SortOrder = "asc" | "desc";
+  const [sortBy, setSortBy] = useState<SortField>("date");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
   useEffect(() => {
     fetchApplications();
@@ -35,6 +52,56 @@ export function KanbanBoard() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Extract unique companies and positions for filters
+  const uniqueCompanies = useMemo(() => {
+    const companies = Array.from(new Set(applications.map((app) => app.company)));
+    return companies.sort((a, b) => a.localeCompare(b));
+  }, [applications]);
+
+  const uniquePositions = useMemo(() => {
+    const positions = Array.from(new Set(applications.map((app) => app.position)));
+    return positions.sort((a, b) => a.localeCompare(b));
+  }, [applications]);
+
+  // Filter and sort applications
+  const filteredApplications = useMemo(() => {
+    let result = applications.filter((app) => {
+      if (companyFilter !== "all" && app.company !== companyFilter) {
+        return false;
+      }
+      if (positionFilter !== "all" && app.position !== positionFilter) {
+        return false;
+      }
+      return true;
+    });
+
+    // Sort
+    result = [...result].sort((a, b) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case "date":
+          comparison = new Date(a.applicationDate).getTime() - new Date(b.applicationDate).getTime();
+          break;
+        case "company":
+          comparison = a.company.localeCompare(b.company);
+          break;
+        case "interest":
+          comparison = a.interestLevel - b.interestLevel;
+          break;
+      }
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+
+    return result;
+  }, [applications, companyFilter, positionFilter, sortBy, sortOrder]);
+
+  const hasActiveFilters = companyFilter !== "all" || positionFilter !== "all";
+
+  const clearFilters = () => {
+    setCompanyFilter("all");
+    setPositionFilter("all");
   };
 
   const handleDragEnd = async (result: DropResult) => {
@@ -128,7 +195,7 @@ export function KanbanBoard() {
   };
 
   const getApplicationsByStatus = (status: ApplicationStatus) =>
-    applications.filter((app) => app.status === status);
+    filteredApplications.filter((app) => app.status === status);
 
   if (isLoading) {
     return (
@@ -154,10 +221,92 @@ export function KanbanBoard() {
         </Button>
       </div>
 
+      {/* Filters & Sort Bar */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-muted-foreground">Filter:</span>
+        </div>
+
+        <Select value={companyFilter} onValueChange={setCompanyFilter}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="All Companies" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Companies</SelectItem>
+            {uniqueCompanies.map((company) => (
+              <SelectItem key={company} value={company}>
+                {company}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={positionFilter} onValueChange={setPositionFilter}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="All Positions" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Positions</SelectItem>
+            {uniquePositions.map((position) => (
+              <SelectItem key={position} value={position}>
+                {position}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-9 px-2"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+
+        <div className="h-6 w-px bg-border" />
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-muted-foreground">Sort:</span>
+        </div>
+
+        <Select value={sortBy} onValueChange={(value) => setSortBy(value as "date" | "company" | "interest")}>
+          <SelectTrigger className="w-[130px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="date">Date</SelectItem>
+            <SelectItem value="company">Company</SelectItem>
+            <SelectItem value="interest">Interest</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-9 w-9"
+          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+        >
+          {sortOrder === "asc" ? (
+            <ArrowUp className="h-4 w-4" />
+          ) : (
+            <ArrowDown className="h-4 w-4" />
+          )}
+        </Button>
+
+        {hasActiveFilters && (
+          <span className="text-sm text-muted-foreground ml-auto">
+            {filteredApplications.length} of {applications.length}
+          </span>
+        )}
+      </div>
+
       {/* Mobile List View */}
       <div className="md:hidden">
         <ApplicationsMobileList
-          applications={applications}
+          applications={filteredApplications}
           onEdit={openEditForm}
           onDelete={handleDelete}
         />

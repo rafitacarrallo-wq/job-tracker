@@ -12,7 +12,7 @@ import type { ApplicationStatus } from "@/types";
 interface RecentApplication {
   id: string;
   company: string;
-  companyDomain: string | null;
+  companyWebsite: string | null;
   position: string;
   status: ApplicationStatus;
   applicationDate: string;
@@ -50,7 +50,7 @@ export function RecentApplications({
               >
                 <CompanyLogo
                   company={app.company}
-                  domain={app.companyDomain}
+                  companyWebsite={app.companyWebsite}
                   size="sm"
                 />
                 <div className="flex-1 min-w-0">

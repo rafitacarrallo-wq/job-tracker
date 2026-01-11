@@ -8,17 +8,19 @@ import { RecentApplications } from "./recent-applications";
 interface DashboardData {
   stats: {
     totalApplications: number;
+    savedCount: number;
     thisWeek: number;
     responseRate: number;
     pendingInterviews: number;
     activeApplications: number;
     offers: number;
     watchlistCount: number;
+    pendingTasksCount: number;
   };
   upcomingActions: Array<{
     id: string;
     company: string;
-    companyDomain: string | null;
+    companyWebsite: string | null;
     position: string;
     nextStep: string | null;
     nextStepDate: string;
@@ -33,10 +35,34 @@ interface DashboardData {
       company: string | null;
     };
   }>;
+  upcomingTasks: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    dueDate: string | null;
+    completed: boolean;
+    link: string | null;
+    application: {
+      id: string;
+      company: string;
+      position: string;
+      companyWebsite: string | null;
+    } | null;
+    watchlist: {
+      id: string;
+      name: string;
+      careersUrl: string | null;
+    } | null;
+    contact: {
+      id: string;
+      name: string;
+      company: string | null;
+    } | null;
+  }>;
   recentApplications: Array<{
     id: string;
     company: string;
-    companyDomain: string | null;
+    companyWebsite: string | null;
     position: string;
     status: "SAVED" | "APPLIED" | "INTERVIEW" | "OFFER" | "REJECTED" | "ARCHIVED";
     applicationDate: string;
@@ -94,6 +120,7 @@ export function Dashboard() {
         <UpcomingActions
           actions={data.upcomingActions}
           reminders={data.upcomingReminders}
+          tasks={data.upcomingTasks}
         />
         <RecentApplications applications={data.recentApplications} />
       </div>

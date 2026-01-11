@@ -86,8 +86,7 @@ export function ApplicationsMobileList({
             >
               <CompanyLogo
                 company={application.company}
-                domain={application.companyDomain}
-                logo={application.companyLogo}
+                companyWebsite={application.companyWebsite}
                 size="sm"
               />
 

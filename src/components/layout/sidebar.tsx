@@ -8,12 +8,14 @@ import {
   Users,
   Building2,
   Briefcase,
+  CheckSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Applications", href: "/applications", icon: Kanban },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Contacts", href: "/contacts", icon: Users },
   { name: "Watchlist", href: "/watchlist", icon: Building2 },
 ];
