@@ -13,6 +13,7 @@ interface DashboardData {
     pendingInterviews: number;
     activeApplications: number;
     offers: number;
+    watchlistCount: number;
   };
   upcomingActions: Array<{
     id: string;

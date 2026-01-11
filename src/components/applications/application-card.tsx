@@ -29,9 +29,10 @@ export function ApplicationCard({
 }: ApplicationCardProps) {
   return (
     <div
-      className={`group rounded-lg border bg-card p-3 shadow-sm transition-all hover:shadow-md ${
+      className={`group cursor-pointer rounded-lg border bg-card p-3 shadow-sm transition-all hover:shadow-md ${
         isDragging ? "rotate-2 shadow-lg" : ""
       }`}
+      onClick={() => onEdit(application)}
     >
       <div className="flex items-start gap-3">
         <CompanyLogo
@@ -58,6 +59,7 @@ export function ApplicationCard({
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 md:opacity-0 md:group-hover:opacity-100"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>

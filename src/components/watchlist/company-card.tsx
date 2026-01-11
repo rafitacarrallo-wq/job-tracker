@@ -22,7 +22,10 @@ interface CompanyCardProps {
 
 export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
   return (
-    <Card className="group transition-shadow hover:shadow-md">
+    <Card
+      className="group cursor-pointer transition-shadow hover:shadow-md"
+      onClick={() => onEdit(company)}
+    >
       <CardContent className="p-3 md:p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 md:gap-3 min-w-0">
@@ -47,6 +50,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 shrink-0 md:opacity-0 md:group-hover:opacity-100"
+                onClick={(e) => e.stopPropagation()}
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -90,6 +94,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 md:mt-3 inline-flex items-center gap-1 text-xs md:text-sm text-primary hover:underline"
+            onClick={(e) => e.stopPropagation()}
           >
             <ExternalLink className="h-3 w-3" />
             Careers Page

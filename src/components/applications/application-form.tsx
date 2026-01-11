@@ -44,6 +44,16 @@ interface ApplicationFormProps {
   defaultStatus?: ApplicationStatus;
 }
 
+// Extract clean domain from URL or domain string
+function cleanDomain(input: string): string {
+  let domain = input.trim().toLowerCase();
+  domain = domain.replace(/^https?:\/\//, "");
+  domain = domain.replace(/^www\./, "");
+  domain = domain.split("/")[0];
+  domain = domain.split(":")[0];
+  return domain;
+}
+
 function inferDomain(company: string): string | null {
   const cleaned = company.toLowerCase().replace(/[^a-z0-9]/g, "");
   if (cleaned) {
@@ -176,7 +186,15 @@ export function ApplicationForm({
                     companyDomain: e.target.value,
                   }))
                 }
-                placeholder="e.g., google.com"
+                onBlur={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    companyDomain: e.target.value
+                      ? cleanDomain(e.target.value)
+                      : "",
+                  }))
+                }
+                placeholder="e.g., google.com or https://google.com"
               />
             </div>
           </div>

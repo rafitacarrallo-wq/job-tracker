@@ -11,6 +11,25 @@ interface CompanyLogoProps {
   className?: string;
 }
 
+// Extract clean domain from URL or domain string
+function cleanDomain(input: string): string {
+  let domain = input.trim().toLowerCase();
+
+  // Remove protocol
+  domain = domain.replace(/^https?:\/\//, "");
+
+  // Remove www.
+  domain = domain.replace(/^www\./, "");
+
+  // Remove path (everything after first /)
+  domain = domain.split("/")[0];
+
+  // Remove port if present
+  domain = domain.split(":")[0];
+
+  return domain;
+}
+
 const sizeClasses = {
   sm: "h-8 w-8 text-xs",
   md: "h-10 w-10 text-sm",
@@ -86,7 +105,7 @@ export function CompanyLogo({
 
   // Try Clearbit if we have a domain
   const clearbitUrl = domain
-    ? `https://logo.clearbit.com/${domain}`
+    ? `https://logo.clearbit.com/${cleanDomain(domain)}`
     : null;
 
   if (clearbitUrl && !imgError) {

@@ -20,6 +20,16 @@ interface CompanyFormProps {
   onSubmit: (data: Partial<WatchlistCompany>) => void;
 }
 
+// Extract clean domain from URL or domain string
+function cleanDomain(input: string): string {
+  let domain = input.trim().toLowerCase();
+  domain = domain.replace(/^https?:\/\//, "");
+  domain = domain.replace(/^www\./, "");
+  domain = domain.split("/")[0];
+  domain = domain.split(":")[0];
+  return domain;
+}
+
 function inferDomain(name: string): string | null {
   const cleaned = name.toLowerCase().replace(/[^a-z0-9]/g, "");
   if (cleaned) {
@@ -102,7 +112,13 @@ export function CompanyForm({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, domain: e.target.value }))
               }
-              placeholder="e.g., stripe.com"
+              onBlur={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  domain: e.target.value ? cleanDomain(e.target.value) : "",
+                }))
+              }
+              placeholder="e.g., stripe.com or https://stripe.com"
             />
           </div>
 

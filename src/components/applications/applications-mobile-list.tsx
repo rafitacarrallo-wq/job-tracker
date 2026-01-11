@@ -81,7 +81,8 @@ export function ApplicationsMobileList({
           filteredApplications.map((application) => (
             <div
               key={application.id}
-              className="flex items-start gap-3 py-4"
+              className="flex cursor-pointer items-start gap-3 py-4"
+              onClick={() => onEdit(application)}
             >
               <CompanyLogo
                 company={application.company}
@@ -103,7 +104,12 @@ export function ApplicationsMobileList({
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>

@@ -7,6 +7,7 @@ import {
   Calendar,
   Target,
   Award,
+  Bookmark,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -18,6 +19,7 @@ interface StatsCardsProps {
     pendingInterviews: number;
     activeApplications: number;
     offers: number;
+    watchlistCount: number;
   };
 }
 
@@ -65,10 +67,17 @@ export function StatsCards({ stats }: StatsCardsProps) {
       color: "text-emerald-500",
       bgColor: "bg-emerald-500/10",
     },
+    {
+      title: "Watchlist",
+      value: stats.watchlistCount,
+      icon: Bookmark,
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/10",
+    },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
       {cards.map((card) => (
         <Card key={card.title}>
           <CardContent className="p-3 md:p-4">

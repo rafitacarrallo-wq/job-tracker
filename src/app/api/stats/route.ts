@@ -41,6 +41,9 @@ export async function GET() {
     // Offers
     const offers = applications.filter((app: Application) => app.status === "OFFER").length;
 
+    // Watchlist count (saved companies not yet applied to)
+    const watchlistCount = await prisma.watchlistCompany.count();
+
     // Get upcoming actions (next steps with dates)
     const upcomingActions = await prisma.application.findMany({
       where: {
@@ -112,6 +115,7 @@ export async function GET() {
         pendingInterviews,
         activeApplications,
         offers,
+        watchlistCount,
       },
       upcomingActions,
       upcomingReminders,
