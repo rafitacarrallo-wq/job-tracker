@@ -13,7 +13,9 @@
       "Bash(gh --version:*)",
       "Bash(git config:*)",
       "Bash(if exist nul del /f nul)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ]
   }
 }
