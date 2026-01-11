@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { startOfWeek, endOfWeek } from "date-fns";
+import type { Application } from "@prisma/client";
 
 export async function GET() {
   try {
@@ -15,30 +16,30 @@ export async function GET() {
     const totalApplications = applications.length;
 
     // Applications this week
-    const thisWeek = applications.filter((app) => {
+    const thisWeek = applications.filter((app: Application) => {
       const date = new Date(app.applicationDate);
       return date >= weekStart && date <= weekEnd;
     }).length;
 
     // Response rate (anything beyond APPLIED)
-    const responded = applications.filter((app) =>
+    const responded = applications.filter((app: Application) =>
       ["INTERVIEW", "OFFER", "REJECTED"].includes(app.status)
     ).length;
-    const applied = applications.filter((app) => app.status !== "SAVED").length;
+    const applied = applications.filter((app: Application) => app.status !== "SAVED").length;
     const responseRate = applied > 0 ? Math.round((responded / applied) * 100) : 0;
 
     // Pending interviews
     const pendingInterviews = applications.filter(
-      (app) => app.status === "INTERVIEW"
+      (app: Application) => app.status === "INTERVIEW"
     ).length;
 
     // Active applications (not rejected/archived)
     const activeApplications = applications.filter(
-      (app) => !["REJECTED", "ARCHIVED"].includes(app.status)
+      (app: Application) => !["REJECTED", "ARCHIVED"].includes(app.status)
     ).length;
 
     // Offers
-    const offers = applications.filter((app) => app.status === "OFFER").length;
+    const offers = applications.filter((app: Application) => app.status === "OFFER").length;
 
     // Get upcoming actions (next steps with dates)
     const upcomingActions = await prisma.application.findMany({
